@@ -41,17 +41,24 @@ public class RestApiMongodbApplication {
             student.setFavouriteSubjects(List.of("Math", "Algorithm", "Art"));
             student.setCreatedAt(LocalDateTime.now());
 
-            Query query = new Query();
-            query.addCriteria(Criteria.where("email").is("fikri@mail.com"));
-            List<Student> students =  mongoTemplate.find(query,Student.class);
+//            mongoTemplateAndQuery(mongoTemplate);
 
-            if (!students.isEmpty()){
-                System.out.println("email used");
+            studentRepository.findByEmail("fikri@mail.com").ifPresent(student1 -> {
                 throw new IllegalStateException("email used");
-            }
-
+            });
             studentRepository.save(student);
         };
 
+    }
+
+    private void mongoTemplateAndQuery(MongoTemplate mongoTemplate) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("email").is("fikri@mail.com"));
+        List<Student> students =  mongoTemplate.find(query,Student.class);
+
+        if (!students.isEmpty()){
+            System.out.println("email used");
+            throw new IllegalStateException("email used");
+        }
     }
 }
