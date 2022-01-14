@@ -8,6 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -22,7 +25,7 @@ public class RestApiMongodbApplication {
 
 
     @Bean
-    CommandLineRunner runner(StudentRepository studentRepository) {
+    CommandLineRunner runner(StudentRepository studentRepository, MongoTemplate mongoTemplate) {
         return args -> {
             Address address = new Address();
             address.setCode("PO90");
@@ -37,6 +40,15 @@ public class RestApiMongodbApplication {
             student.setAddress(address);
             student.setFavouriteSubjects(List.of("Math", "Algorithm", "Art"));
             student.setCreatedAt(LocalDateTime.now());
+
+            Query query = new Query();
+            query.addCriteria(Criteria.where("email").is("fikri@mail.com"));
+            List<Student> students =  mongoTemplate.find(query,Student.class);
+
+            if (!students.isEmpty()){
+                System.out.println("email used");
+                throw new IllegalStateException("email used");
+            }
 
             studentRepository.save(student);
         };
